@@ -11,6 +11,8 @@ from sqlalchemy.exc import SAWarning
 # Suppress specific SAWarning from SQLAlchemy about Decimal types
 warnings.filterwarnings('ignore', r".*support Decimal objects natively.*", SAWarning)
 
+# User input
+userInput = "Can I get a look at all the sales records, and while you're at it, throw in the full scoop on the customers? I'm talking about getting their names, where they work, and all their contact details—address, phone number, and email. Just match up the sales to the customer IDs so I know who's who. Thanks!"
 
 # Load environment variables from .env file
 load_dotenv()
@@ -56,6 +58,11 @@ sql_response = (
     | StrOutputParser()
 )
 
+# Invoke the SQL response chain with the question and print the SQL query
+sql_query_result = sql_response.invoke({"question": userInput})
+print("Generated SQL Query:")
+print(sql_query_result)
+
 # Build the full chain for generating the natural language response
 full_chain = (
     RunnablePassthrough.assign(query=sql_response).assign(
@@ -67,5 +74,6 @@ full_chain = (
 )
 
 # Invoke the full chain with the question and print the result
-result = full_chain.invoke({"question": "How many employees are there?"})
+result = full_chain.invoke({"question": userInput})
+print("\nNatural Language Response:")
 print(result)
